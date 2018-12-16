@@ -91,21 +91,28 @@ public class INIConfig {
 			while((line = reader.readLine()) != null)
 			{
 				String[] tokens = line.split("=");
-				String name = tokens[0];
-				String value = tokens[1];
 				
-				INIProperty<?> property = properties.get(name);
-				
-				if(property != null)
+				if(tokens.length > 1)
 				{
-					switch (property.type.getSimpleName())
+					String name = tokens[0].toLowerCase().trim();
+					
+					if(name.startsWith("[") || name.startsWith("#") || name.startsWith("#") || name == "") continue;
+					
+					String value = tokens[1].trim();
+					
+					INIProperty<?> property = properties.get(name.toLowerCase());
+					
+					if(property != null)
 					{
-						case "Integer": ((INIProperty<Integer>)property).value = Integer.parseInt(value); 		break;
-						case "Float": 	((INIProperty<Float>)property).value = Float.parseFloat(value); 		break;
-						case "Double": 	((INIProperty<Double>)property).value = Double.parseDouble(value); 		break;
-						case "String": 	((INIProperty<String>)property).value = value; 							break;
-						case "Boolean": ((INIProperty<Boolean>)property).value = Boolean.parseBoolean(value); 	break;
-						default: break;
+						switch (property.type.getSimpleName())
+						{
+							case "Integer": ((INIProperty<Integer>)property).value = Integer.parseInt(value); 		break;
+							case "Float": 	((INIProperty<Float>)property).value = Float.parseFloat(value); 		break;
+							case "Double": 	((INIProperty<Double>)property).value = Double.parseDouble(value); 		break;
+							case "String": 	((INIProperty<String>)property).value = value; 							break;
+							case "Boolean": ((INIProperty<Boolean>)property).value = Boolean.parseBoolean(value); 	break;
+							default: break;
+						}
 					}
 				}
 				
@@ -160,7 +167,7 @@ public class INIConfig {
 	 */
 	public <T> void addProperty(Class<T> type, String name, T defaultValue)
 	{
-		properties.put(name, new INIProperty<T>(type, name, defaultValue));
+		properties.put(name.toLowerCase(), new INIProperty<T>(type, name, defaultValue));
 	}
 	
 	/**
@@ -170,7 +177,7 @@ public class INIConfig {
 	 */
 	public void removeProperty(String name)
 	{
-		properties.remove(name);
+		properties.remove(name.toLowerCase());
 	}
 	
 	/**
@@ -182,7 +189,7 @@ public class INIConfig {
 	 */
 	public <T> void setAs(Class<T> type, String name, T value)
 	{
-		INIProperty<?> property = properties.get(name);
+		INIProperty<?> property = properties.get(name.toLowerCase());
 		
 		if(property != null && property.type == type)
 		{
@@ -200,7 +207,7 @@ public class INIConfig {
 	 */
 	public <T> T getAs(Class<T> type, String name)
 	{
-		INIProperty<?> property = properties.get(name);
+		INIProperty<?> property = properties.get(name.toLowerCase());
 		
 		if(property != null)
 			return type.cast(property.value);
